@@ -29,10 +29,8 @@ class _HomePageViewState extends State<HomePageView> {
     'DECEMBER'
   ];
   List<String> day = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-  // WeatherData weatherD = WeatherData();
+  // String iconUrl = "http://openweathermap.org/img/w/03d.png";
   bool isLoading = false;
-  // DateTime sunriseTime;
-  // DateTime sunsetTime;
 
   @override
   void initState() {
@@ -41,10 +39,15 @@ class _HomePageViewState extends State<HomePageView> {
 
   Future<WeatherData> getWeatherData() async {
     final response = await http.get(
-      "http://api.openweathermap.org/data/2.5/weather?q=chennai&appid=${apiKey}",
+      "http://api.openweathermap.org/data/2.5/weather?q=chennai&appid=${apiKey}&units=metric",
     );
     Map responseBody = json.decode(response.body);
     return WeatherData.fromJson(responseBody);
+  }
+
+  _parseEpoch(dateTime) {
+    var time = dateTime.millisecondsSinceEpoch ~/ 1000;
+    return time;
   }
 
   @override
@@ -68,8 +71,8 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            //SVG Image
             Container(
               margin: EdgeInsets.all(0),
               padding: EdgeInsets.all(4),
@@ -79,48 +82,126 @@ class _HomePageViewState extends State<HomePageView> {
                 fit: BoxFit.contain,
               ),
             ),
+
+            //Small Divider
             Container(
               color: Colors.grey[200],
               height: 3,
               width: MediaQuery.of(context).size.width * 0.20,
             ),
+
+            //Async
             FutureBuilder<WeatherData>(
               future: getWeatherData(),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
                   return Column(
                     children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(16),
-                            // color: Colors.teal,
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              'Chennai',
-                              style:
-                                  TextStyle(fontSize: 25, color: Colors.black),
-                              textAlign: TextAlign.left,
-                            ),
+                      //City Name
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          color: Colors.teal,
+                          alignment: Alignment.center,
+                          child: Text(
+                            'CHENNAI, TAMIL NADU',
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: Colors.black,
+                                letterSpacing: 2),
+                            textAlign: TextAlign.left,
                           ),
-                          Container(
-                            // color: Colors.orange,
-                            padding: EdgeInsets.all(12),
-
-                            child: Text(
-                              snapshot.data.description,
-                              style: TextStyle(fontSize: 25),
-                              textAlign: TextAlign.end,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        child: Text(
-                          snapshot.data.windSpeed.toString() + " kmph",
-                          style: TextStyle(fontSize: 25),
                         ),
                       ),
+
+                      //Temperature
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            snapshot.data.temperature + "° C",
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //Description
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            toBeginningOfSentenceCase(
+                                snapshot.data.description),
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //Min and Max Temp
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            "H " +
+                                snapshot.data.maxTemp.toString() +
+                                "° C " +
+                                "/ L " +
+                                snapshot.data.minTemp.toString() +
+                                "° C",
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //Humidity
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            "Humidity " + snapshot.data.humidity + "%",
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //Sunrise Time
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            'Sunrise at ' +
+                                DateFormat("hh:mm a").format(
+                                    _parseEpoch(snapshot.data.sunriseTime)),
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //Sunset Time
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            'Sunset at ' +
+                                DateFormat("hh:mm a").format(
+                                    _parseEpoch(snapshot.data.sunsetTime)),
+                            style: TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+
+                      //WindSpeed
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          child: Text(
+                            snapshot.data.windSpeed.toStringAsFixed(2) +
+                                " kmph",
+                            style: TextStyle(fontSize: 25),
+                          ),
+                        ),
+                      )
                     ],
                   );
                 } else {
@@ -144,28 +225,29 @@ class _HomePageViewState extends State<HomePageView> {
                           width: MediaQuery.of(context).size.width * 0.80,
                           child: LinearProgressIndicator(),
                         ),
-
-                        //Prints the day, date and time 
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${day[current.weekday - 1]} | ${months[current.month - 1]} ${current.day}, ${current.year} |  ${DateFormat("hh:mm a").format(current)}',
-                                style: TextStyle(
-                                    fontSize: 24, color: Colors.black38),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   );
                 }
               },
-            )
+            ),
+
+            //Prints the day, date and time
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(10),
+                  margin: EdgeInsets.all(4),
+                  color: Colors.yellow,
+                  child: Text(
+                    '${day[current.weekday - 1]} | ${months[current.month - 1]} ${current.day}, ${current.year} |  ${DateFormat("hh:mm a").format(current)}',
+                    style: TextStyle(fontSize: 24, color: Colors.black38),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
