@@ -13,7 +13,7 @@ class WeatherDataModel extends ChangeNotifier {
   }
   WeatherDataModel._internal();
   WeatherData _weather;
-  final apiKey = "c65cfd1d349d708a4c1fba7633d23bed";
+  final apiKey = "<Insert your API Key here>";
 
   //To fetch the value from API
   Future getWeatherData() async {
