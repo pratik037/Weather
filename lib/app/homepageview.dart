@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/app/model/weatherDataModel.dart';
 import 'dart:core';
-
 import 'package:weather/app/widgets/dateTime.dart';
+import 'package:weather/app/widgets/loader.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 class HomePageView extends StatefulWidget {
   final WeatherDataModel weatherDataModel;
@@ -72,29 +72,7 @@ class _HomePageViewState extends State<HomePageView> {
             width: MediaQuery.of(context).size.width * 0.20,
           ),
           isLoading
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          height: 50,
-                          child: Text(
-                            "LOADING",
-                            style: TextStyle(fontSize: 25, letterSpacing: 3),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width * 0.80,
-                        child: LinearProgressIndicator(),
-                      ),
-                    ],
-                  ),
-                )
+              ? Loader()
               : Column(
                   children: <Widget>[
                     //City Heading
@@ -108,84 +86,146 @@ class _HomePageViewState extends State<HomePageView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(8),
-                          height: MediaQuery.of(context).size.height * 0.20,
-                          width: MediaQuery.of(context).size.width * 0.30,
-                          padding: EdgeInsets.all(8),
-                          alignment: Alignment.centerLeft,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                      'http://openweathermap.org/img/wn/${weatherDataModel.weatherIconLabel}@2x.png'))),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            margin: EdgeInsets.all(8),
+                            height: MediaQuery.of(context).size.height * 0.20,
+                            width: MediaQuery.of(context).size.width * 0.30,
+                            padding: EdgeInsets.all(8),
+                            alignment: Alignment.centerLeft,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(
+                                        'http://openweathermap.org/img/wn/${weatherDataModel.weatherIconLabel}@2x.png'))),
+                          ),
                         ),
-                        Container(
-                          padding: EdgeInsets.all(8),
-                          height: MediaQuery.of(context).size.height * 0.20,
-                          alignment: Alignment.center,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Text(
-                                toBeginningOfSentenceCase(
-                                    weatherDataModel.weatherDescription),
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 25),
-                              ),
-                              Text(
-                                "Temperature: " +
-                                    weatherDataModel.weatherTemperature
-                                        .toString() +
-                                    "° C",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 25),
-                              ),
-                              Text(
-                                "Humidity: " +
-                                    weatherDataModel.weatherHumidity
-                                        .toString() +
-                                    "% hPa",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 25),
-                              ),
-                            ],
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            height: MediaQuery.of(context).size.height * 0.20,
+                            alignment: Alignment.center,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    BoxedIcon(
+                                      WeatherIcons.day_sunny_overcast,
+                                      color: Colors.black45,
+                                    ),
+                                    Text(
+                                      toBeginningOfSentenceCase(
+                                          weatherDataModel.weatherDescription),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 25),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    BoxedIcon(
+                                      WeatherIcons.thermometer,
+                                      color: Colors.black45,
+                                    ),
+                                    Text(
+                                      "Temperature: " +
+                                          weatherDataModel.weatherTemperature
+                                              .toString() +
+                                          "° C",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 25),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    BoxedIcon(
+                                      WeatherIcons.humidity,
+                                      color: Colors.black45,
+                                    ),
+                                    Text(
+                                      "Humidity: " +
+                                          weatherDataModel.weatherHumidity
+                                              .toString() +
+                                          "% hPa",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 25),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(Icons.arrow_upward),
-                              Text(DateFormat("hh:mm a").format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      weatherDataModel.weatherSunriseTime ~/
-                                          1000)))
-                            ],
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                BoxedIcon(
+                                  WeatherIcons.sunrise,
+                                  color: Colors.yellow,
+                                ),
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                Text(
+                                  DateFormat("hh:mm a").format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          weatherDataModel.weatherSunriseTime ~/
+                                              1000)),
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                         Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Icon(Icons.arrow_downward),
-                              Text(DateFormat("hh:mm a").format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      weatherDataModel.weatherSunsetTime ~/
-                                          1000)))
-                            ],
+                          color: Colors.grey[300],
+                          margin: EdgeInsets.all(2),
+                          height: MediaQuery.of(context).size.height * 0.04,
+                          width: 3,
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                BoxedIcon(
+                                  WeatherIcons.sunset,
+                                  color: Colors.deepOrange,
+                                ),
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                Text(
+                                  DateFormat("hh:mm a").format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          weatherDataModel.weatherSunsetTime ~/
+                                              1000)),
+                                  style: TextStyle(
+                                      fontSize: 20, color: Colors.white),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-
           DateTimeBar()
         ],
       ),

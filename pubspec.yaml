@@ -35,8 +35,8 @@ dependencies:
 
   provider: ^3.1.0
 
-  #For different Icons
-  font_awesome_flutter: ^8.5.0
+  #For different Weather Icons
+  weather_icons: ^2.0.0
 
 dev_dependencies:
   flutter_test:

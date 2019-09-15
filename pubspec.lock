@@ -60,13 +60,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  font_awesome_flutter:
-    dependency: "direct main"
-    description:
-      name: font_awesome_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "8.5.0"
   http:
     dependency: "direct main"
     description:
@@ -212,6 +205,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  weather_icons:
+    dependency: "direct main"
+    description:
+      name: weather_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   xml:
     dependency: transitive
     description:
