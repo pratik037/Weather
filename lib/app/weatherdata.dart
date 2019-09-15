@@ -3,37 +3,31 @@ class WeatherData{
   final double windSpeed;
   final int sunriseTime;
   final int sunsetTime;
-  final int temperature;
-  final int minTemp;
-  final int maxTemp;
+  final num temperature;
   final int humidity;
-  final String icon;
+  final String iconLabel;
 
   WeatherData(
       {
-        this.icon,
         this.description,
         this.windSpeed,
         this.sunriseTime,
         this.sunsetTime,
         this.temperature,
-        this.minTemp,
-        this.maxTemp,
         this.humidity,
+        this.iconLabel,
       }
     );
 
   factory WeatherData.fromJson(Map<String,dynamic> json){
     return WeatherData(
-    description : json['weather'][0]['description'],
-    windSpeed : json['wind']['speed'] * 3.6,
-    temperature: json['main']['temp'],
-    minTemp: json['main']['temp_min'],
-    maxTemp: json['main']['temp_max'],
-    sunriseTime : json['sys']['sunrise'],
-    sunsetTime : json['sys']['sunset'],
-    humidity: json['main']['humidity'],
-    icon: json['weather']['icon'],
+    description : json['weather'][0]['description'] ?? '',
+    windSpeed : json['wind']['speed'] ?? 0.0,
+    temperature: json['main']['temp'] ?? 0,
+    sunriseTime : json['sys']['sunrise'] ?? 0,
+    sunsetTime : json['sys']['sunset'] ?? 0,
+    humidity: json['main']['humidity'] ?? 0,
+    iconLabel: json['weather'][0]['icon'] ?? '',
     );
   }
 }

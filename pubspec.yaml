@@ -33,6 +33,11 @@ dependencies:
   #For DateTime parsing
   intl: ^0.16.0
 
+  provider: ^3.1.0
+
+  #For different Icons
+  font_awesome_flutter: ^8.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
