@@ -38,6 +38,9 @@ dependencies:
   #For different Weather Icons
   weather_icons: ^2.0.0
 
+  #For Text resize
+  auto_size_text: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -19,12 +19,12 @@ class WeatherDataModel extends ChangeNotifier {
   Future getWeatherData() async {
     final response = await http.get(
         "http://api.openweathermap.org/data/2.5/weather?q=chennai&appid=$apiKey&units=metric");
+    
+    //Converting the response body from JSON to Map
     Map responseBody = json.decode(response.body);
 
     //Assigning the returned value to a WeatherData variable
     _weather = WeatherData.fromJson(responseBody);
-    print("SunRise: " + _weather.sunriseTime.toString());
-    print("Sunset : " + _weather.sunsetTime.toString());
   }
 
   String get weatherDescription => _weather.description;
@@ -40,4 +40,6 @@ class WeatherDataModel extends ChangeNotifier {
   int get weatherHumidity => _weather.humidity;
 
   String get weatherIconLabel => _weather.iconLabel;
+
+  num get weatherWindDirection => _weather.windDirection;
 }
