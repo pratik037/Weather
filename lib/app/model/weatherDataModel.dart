@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:weather/app/weatherdata.dart';
+import 'package:weather/apikey.dart' as apikey;
 
 class WeatherDataModel extends ChangeNotifier {
   //To make singleton class
@@ -13,12 +14,14 @@ class WeatherDataModel extends ChangeNotifier {
   }
   WeatherDataModel._internal();
   WeatherData _weather;
-  final apiKey = "<Insert your API Key here>";
+  // final apiKey = "<Insert your API Key here>";
+
 
   //To fetch the value from API
-  Future getWeatherData() async {
+  Future getWeatherData({@required String city}) async {
+    String searchCity = city.toLowerCase();
     final response = await http.get(
-        "http://api.openweathermap.org/data/2.5/weather?q=chennai&appid=$apiKey&units=metric");
+        "http://api.openweathermap.org/data/2.5/weather?q=$searchCity&appid=${apikey.apiKey}&units=metric");
     
     //Converting the response body from JSON to Map
     Map responseBody = json.decode(response.body);
@@ -26,6 +29,7 @@ class WeatherDataModel extends ChangeNotifier {
     //Assigning the returned value to a WeatherData variable
     _weather = WeatherData.fromJson(responseBody);
   }
+  String get cityName => _weather.name;
 
   String get weatherDescription => _weather.description;
 

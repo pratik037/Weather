@@ -19,12 +19,13 @@ class HomePageView extends StatefulWidget {
 class _HomePageViewState extends State<HomePageView> {
   WeatherDataModel weatherDataModel;
   bool isLoading = false;
+  TextEditingController searchResult = TextEditingController();
 
   @override
   void initState() {
     weatherDataModel = this.widget.weatherDataModel;
     super.initState();
-    Future.delayed(Duration(milliseconds: 100)).whenComplete(() {
+    Future.delayed(Duration(milliseconds: 200)).whenComplete(() {
       _getWeather();
     });
   }
@@ -33,7 +34,8 @@ class _HomePageViewState extends State<HomePageView> {
     setState(() {
       isLoading = true;
     });
-    await weatherDataModel.getWeatherData();
+    openSearchBox();
+    await weatherDataModel.getWeatherData(city: searchResult.text);
 
     setState(() {
       isLoading = false;
@@ -56,51 +58,55 @@ class _HomePageViewState extends State<HomePageView> {
           IconButton(
             icon: Icon(
               Icons.refresh,
-              color: Colors.black,
             ),
             onPressed: _getWeather,
-          )
+          ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: openSearchBox,
+          ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          //Top SVG Image
-          Container(
-            margin: EdgeInsets.all(5),
-            padding: EdgeInsets.all(2),
-            height: MediaQuery.of(context).size.height * 0.35,
-            child: SvgPicture.asset('assets/images/weather2.svg',
-                fit: BoxFit.fitWidth),
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            //Top SVG Image
+            Container(
+              margin: EdgeInsets.all(5),
+              padding: EdgeInsets.all(2),
+              height: MediaQuery.of(context).size.height * 0.35,
+              child: SvgPicture.asset('assets/images/weather2.svg',
+                  fit: BoxFit.fitWidth),
+            ),
 
-          //Small Divider
-          Container(
-            color: Colors.grey[300],
-            margin: EdgeInsets.all(2),
-            height: 3,
-            width: MediaQuery.of(context).size.width * 0.20,
-          ),
+            //Small Divider
+            Container(
+              color: Colors.grey[300],
+              margin: EdgeInsets.all(2),
+              height: 3,
+              width: MediaQuery.of(context).size.width * 0.20,
+            ),
 
-          //Asynchronous Code Begins.
-          isLoading
-              ? Loader()
-              : Column(
-                  children: <Widget>[
-                    //City Heading
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Chennai, TN",
-                        style: TextStyle(fontSize: 35, color: Colors.white),
+            //Asynchronous Code Begins.
+            isLoading
+                ? Loader()
+                : Column(
+                    children: <Widget>[
+                      //City Heading
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          weatherDataModel.cityName,
+                          style: TextStyle(fontSize: 35, color: Colors.white),
+                        ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          // child: Container(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(
+                            flex: 1,
+                            // child: Container(
                             // color: Colors.yellow,
                             child: Column(
                               children: <Widget>[
@@ -111,7 +117,7 @@ class _HomePageViewState extends State<HomePageView> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.25,
                                   padding: EdgeInsets.all(8),
-                                  
+
                                   decoration: BoxDecoration(
                                       // color: Colors.red,
                                       image: DecorationImage(
@@ -140,153 +146,230 @@ class _HomePageViewState extends State<HomePageView> {
                                 )
                               ],
                             ),
-                          // ),
-                        ),
+                            // ),
+                          ),
 
-                        //Right side column
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            
-                            margin: EdgeInsets.all(4),
-                            padding: EdgeInsets.all(4),
-                            height: MediaQuery.of(context).size.height * 0.20,
-                            alignment: Alignment.center,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    BoxedIcon(
-                                      WeatherIcons.day_sunny_overcast,
-                                      color: Colors.black45,
-                                    ),
-                                    AutoSizeText(
-                                      toBeginningOfSentenceCase(
-                                          weatherDataModel.weatherDescription),
-                                      style: TextStyle(color: Colors.white),
-                                      maxLines: 1,
-                                      minFontSize: 18,
-                                      maxFontSize: 25,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    BoxedIcon(
-                                      WeatherIcons.thermometer,
-                                      color: Colors.black45,
-                                    ),
-                                    AutoSizeText(
-                                      "Temperature: " +
-                                          weatherDataModel.weatherTemperature
-                                              .toString() +
-                                          "° C",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 25),
-                                      maxLines: 1,
-                                      maxFontSize: 25,
-                                      minFontSize: 18,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    BoxedIcon(
-                                      WeatherIcons.humidity,
-                                      color: Colors.black45,
-                                    ),
-                                    Text(
-                                      "Humidity: " +
-                                          weatherDataModel.weatherHumidity
-                                              .toString() +
-                                          "% hPa",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 25),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          //Right side column
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              margin: EdgeInsets.all(4),
+                              padding: EdgeInsets.all(4),
+                              height: MediaQuery.of(context).size.height * 0.20,
+                              alignment: Alignment.center,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      BoxedIcon(
+                                        WeatherIcons.day_sunny_overcast,
+                                        color: Colors.black45,
+                                      ),
+                                      AutoSizeText(
+                                        toBeginningOfSentenceCase(
+                                            weatherDataModel
+                                                .weatherDescription),
+                                        style: TextStyle(color: Colors.white),
+                                        maxLines: 1,
+                                        minFontSize: 18,
+                                        maxFontSize: 25,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      BoxedIcon(
+                                        WeatherIcons.thermometer,
+                                        color: Colors.black45,
+                                      ),
+                                      AutoSizeText(
+                                        "Temperature: " +
+                                            weatherDataModel.weatherTemperature
+                                                .toString() +
+                                            "° C",
+                                        style: TextStyle(
+                                            color: Colors.white),
+                                        maxLines: 1,
+                                        maxFontSize: 25,
+                                        minFontSize: 18,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      BoxedIcon(
+                                        WeatherIcons.humidity,
+                                        color: Colors.black45,
+                                      ),
+                                      Text(
+                                        "Humidity: " +
+                                            weatherDataModel.weatherHumidity
+                                                .toString() +
+                                            "% hPa",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 25),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-
-                        //Sunrise Time
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                BoxedIcon(
-                                  WeatherIcons.sunrise,
-                                  color: Colors.yellow,
-                                ),
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                Text(
-                                  //weatherDataModel.weatherSunriseTime.toString(),
-                                  DateFormat("hh:mm a").format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          weatherDataModel.weatherSunriseTime *
-                                              1000)),
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )
-                              ],
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget>[
+                          //Sunrise Time
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  BoxedIcon(
+                                    WeatherIcons.sunrise,
+                                    color: Colors.yellow,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Text(
+                                    //weatherDataModel.weatherSunriseTime.toString(),
+                                    DateFormat("hh:mm a").format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            weatherDataModel
+                                                    .weatherSunriseTime *
+                                                1000)),
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        //Divider between the times
-                        Container(
-                          color: Colors.grey[300],
-                          margin: EdgeInsets.all(2),
-                          height: MediaQuery.of(context).size.height * 0.04,
-                          width: 3,
-                        ),
+                          //Divider between the times
+                          Container(
+                            color: Colors.grey[300],
+                            margin: EdgeInsets.all(2),
+                            height: MediaQuery.of(context).size.height * 0.04,
+                            width: 3,
+                          ),
 
-                        //Sunset time
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                BoxedIcon(
-                                  WeatherIcons.sunset,
-                                  color: Colors.deepOrange,
-                                ),
-                                SizedBox(
-                                  width: 15,
-                                ),
-                                Text(
-                                  //weatherDataModel.weatherSunsetTime.toString(),
-                                  DateFormat("hh:mm a").format(
-                                      DateTime.fromMillisecondsSinceEpoch(
-                                          weatherDataModel.weatherSunsetTime *
-                                              1000)),
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                )
-                                
-                              ],
+                          //Sunset time
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  BoxedIcon(
+                                    WeatherIcons.sunset,
+                                    color: Colors.deepOrange,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Text(
+                                    //weatherDataModel.weatherSunsetTime.toString(),
+                                    DateFormat("hh:mm a").format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            weatherDataModel.weatherSunsetTime *
+                                                1000)),
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-          DateTimeBar()
-        ],
+                        ],
+                      ),
+                    ],
+                  ),
+            DateTimeBar()
+          ],
+        ),
       ),
     );
+  }
+
+  //Opens the search dialog box
+  openSearchBox() {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            contentPadding: EdgeInsets.only(top: 10.0),
+            content: Container(
+              width: 500.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      "City Search",
+                      style: TextStyle(fontSize: 30.0),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  Divider(
+                    color: Colors.grey,
+                    height: 4.0,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: 30.0, right: 30.0, top: 10, bottom: 10),
+                    child: TextField(
+                      controller: searchResult,
+                      decoration: InputDecoration(
+                        hintText: "Enter City name eg: chennai",
+                        hintStyle: TextStyle(fontSize: 22),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () async{
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await weatherDataModel.getWeatherData(city: searchResult.text);
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF6c63ff),
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(32.0),
+                            bottomRight: Radius.circular(32.0)),
+                      ),
+                      child: Text(
+                        "Search",
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }
