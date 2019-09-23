@@ -29,7 +29,7 @@ class DateTimeBar extends StatelessWidget {
           margin: EdgeInsets.all(4),
           child: Text(
             '${day[current.weekday - 1]} | ${months[current.month - 1]} ${current.day}, ${current.year} |  ${DateFormat("hh:mm a").format(current)}',
-            style: TextStyle(fontSize: 24, color: Colors.white70),
+            style: TextStyle(fontSize: 22, color: Colors.white70),
           ),
         ),
       ],

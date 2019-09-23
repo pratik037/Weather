@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather/app/homepageview.dart';
 import 'package:weather/app/model/weatherDataModel.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(Weather());
 
@@ -12,11 +13,14 @@ class Weather extends StatefulWidget {
 
 class _WeatherState extends State<Weather> {
   WeatherDataModel _weatherDataModel;
+  Future<Position> userPosition;
   @override
   void initState() {
     _weatherDataModel = WeatherDataModel();
     super.initState();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class _WeatherState extends State<Weather> {
       ],
       child: MaterialApp(
         title: 'Weather',
-        home: HomePageView(weatherDataModel: _weatherDataModel,),
+        home: HomePageView(weatherDataModel: _weatherDataModel),
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.teal),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/app/model/weatherDataModel.dart';
 import 'dart:core';
@@ -10,6 +11,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 
 class HomePageView extends StatefulWidget {
   final WeatherDataModel weatherDataModel;
+  // final Position position;
 
   const HomePageView({Key key, this.weatherDataModel}) : super(key: key);
   @override
@@ -18,24 +20,51 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView> {
   WeatherDataModel weatherDataModel;
-  bool isLoading = false;
+  bool isLoading = true;
   TextEditingController searchResult = TextEditingController();
+  String search = '';
+  bool justOpened = true;
 
   @override
   void initState() {
     weatherDataModel = this.widget.weatherDataModel;
     super.initState();
-    Future.delayed(Duration(milliseconds: 200)).whenComplete(() {
-      _getWeather();
-    });
+    _getWeather();
   }
 
   void _getWeather() async {
     setState(() {
       isLoading = true;
     });
-    openSearchBox();
-    await weatherDataModel.getWeatherData(city: searchResult.text);
+
+    if (justOpened) {
+      print('just opened');
+      String cityName = await weatherDataModel.getUserCityName();
+      await weatherDataModel.getWeatherData(city: cityName);
+      setState(() {
+        justOpened = false;
+        search = cityName;
+      });
+    } else {
+      await weatherDataModel.getWeatherData(city: searchResult.text);
+      setState(() {
+        search = searchResult.text;
+        //Added after proper run
+        searchResult.text='';
+      });
+    }
+
+    setState(() {
+      isLoading = false;
+      searchResult.text = '';
+    });
+  }
+
+  void _handleRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    await weatherDataModel.getWeatherData(city: search);
 
     setState(() {
       isLoading = false;
@@ -59,7 +88,7 @@ class _HomePageViewState extends State<HomePageView> {
             icon: Icon(
               Icons.refresh,
             ),
-            onPressed: _getWeather,
+            onPressed: _handleRefresh,
           ),
           IconButton(
             icon: Icon(Icons.search),
@@ -190,8 +219,7 @@ class _HomePageViewState extends State<HomePageView> {
                                             weatherDataModel.weatherTemperature
                                                 .toString() +
                                             "° C",
-                                        style: TextStyle(
-                                            color: Colors.white),
+                                        style: TextStyle(color: Colors.white),
                                         maxLines: 1,
                                         maxFontSize: 25,
                                         minFontSize: 18,
@@ -333,6 +361,7 @@ class _HomePageViewState extends State<HomePageView> {
                         left: 30.0, right: 30.0, top: 10, bottom: 10),
                     child: TextField(
                       controller: searchResult,
+                      autofocus: true,
                       decoration: InputDecoration(
                         hintText: "Enter City name eg: chennai",
                         hintStyle: TextStyle(fontSize: 22),
@@ -341,13 +370,16 @@ class _HomePageViewState extends State<HomePageView> {
                     ),
                   ),
                   InkWell(
-                    onTap: () async{
+                    onTap: () async {
                       setState(() {
                         isLoading = true;
                       });
-                      await weatherDataModel.getWeatherData(city: searchResult.text);
+                      await weatherDataModel.getWeatherData(
+                          city: searchResult.text);
                       setState(() {
                         isLoading = false;
+                        search = searchResult.text;
+                        searchResult.text = '';
                       });
                       Navigator.pop(context);
                     },
